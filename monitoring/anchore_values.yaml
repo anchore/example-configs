@@ -1,0 +1,6 @@
+anchoreGlobal:
+  enableMetrics: true
+  metricsAuthDisabled: true
+
+anchoreEnterpriseGlobal:
+  enabled: true
