@@ -1,2 +1,7 @@
 # example-configs
-A repository for storing example configurations for auxillary system utilized by Anchore Engine
+
+A repository for storing example configurations for auxillary systems utilized by Anchore Engine.
+
+## Contents
+
+- [Monitoring Configs](./monitoring/README.md)

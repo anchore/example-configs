@@ -1,0 +1,54 @@
+grafana:
+  enabled: true
+  defaultDashboardsEnabled: true
+
+prometheus:
+  enabled: true
+
+  additionalServiceMonitors: 
+  - name: "anchore-service-monitor"
+    selector: 
+      matchLabels:
+        app: anchore-anchore-engine
+    namespaceSelector:
+      matchNames: 
+        - anchore
+    endpoints: 
+      - port: "anchore-external-api"
+        interval: 30s
+        path: /metrics
+        scheme: http
+      - port: "anchore-rbac-manager"
+        interval: 30s
+        path: /metrics
+        scheme: http
+      - port: "anchore-catalog-api"
+        interval: 30s
+        path: /metrics
+        scheme: http
+      - port: "anchore-policy-api"
+        interval: 30s
+        path: /metrics
+        scheme: http
+      - port: "anchore-simplequeue-api"
+        interval: 30s
+        path: /metrics
+        scheme: http
+      - port: "feeds-api"
+        interval: 30s
+        path: /metrics
+        scheme: http
+      
+  additionalPodMonitors: 
+  - name: "anchore-pod-monitor"
+    selector:
+      matchLabels:
+        app: anchore-anchore-engine
+    namespaceSelector:
+      matchNames: 
+        - anchore
+    podMetricsEndpoints: 
+      - port: "analyzer-api"
+        interval: 30s
+        path: /metrics
+        scheme: http
