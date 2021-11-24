@@ -87,7 +87,7 @@ pipeline {
                                  // If the scan status indicates not analyzed, we initiate a wait using the timeout configured
                                  // at the beginning of the pipeline.
                                  println("Analysis Status: " + status)
-                                 if (status == "not_analyzed") {
+                                 if (status == "not_analyzed" || status == "analyzing") {
                                      println("Waiting for image to be analyzed...")
                                      sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image wait --timeout $WAIT_TIMEOUT $IMAGENAME:$TAG', returnStdout: true)
                                  }
@@ -99,39 +99,34 @@ pipeline {
                     }
                 }
             }
-            stage("Verify") {
-                steps {
-                    script {
-                        println("Checking scan status...for " + digest)
-                          // Here we use credentials configured in the Jenkins credentials store to authenticate to the anchore instance.
-                         withCredentials([usernamePassword(credentialsId: 'Anchore-Pass', passwordVariable: 'pass', usernameVariable: 'user')]) {
+           stage("Verify") {
+                 steps {
+                     script {
+                         if (anchoreStatus == "available") {
+                             println("Checking scan status...for " + digest)
+                               // Here we use credentials configured in the Jenkins credentials store to authenticate to the anchore instance.
+                             withCredentials([usernamePassword(credentialsId: 'Anchore-Pass', passwordVariable: 'pass', usernameVariable: 'user')]) {
 
-                            println("Check the scan results status")
-                            // Here we are performing a check on the analysis status. We are passing in the digest along with the tag
-                            // Here we make use passing arguments to jq to inject the digest and other envs
-                            // Be aware, the check json payload could contain multiple analysis results if a tag has had the analysis run on it more
-                            // than one time. The below takes a naive approach to this. Also note the --policy $POLICY.  POLICY is an environment
-                            // variable that holds a policy bundle id...so the check call can be performed for a specific policy bundle if desired.
-                            // This of course can be removed if it's not desired. Finally, if the results of the analysis indicate a `fail`, this
-                            // stage will set the pipeline status to `FAILURE` and end the pipeline run.
-                            env.output = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json evaluate check --policy $POLICY $digest --show-history --tag $IMAGENAME":"$TAG | jq --arg DIGEST $digest --arg IMAGE $IMAGENAME:$TAG -r \'.[] | .[$DIGEST] | to_entries | .[] | select(.key | strings| test($IMAGE)) | .value[] .status\'',
-                                        returnStdout: true).trim()
-
-                            if (output == "pass") {
-                                println("Anchore analysis has passed...proceeding")
-                            }
-                            else if (output == "fail") {
-                                println("ERROR:: Anchore analysis indicates an analysis status of FAIL.")
-                                currentBuild.result = 'FAILURE'
-                                error("Stopping early due to Anchore analysis policy failure")
-                            }
-                            else {
-                                println("Anchore analysis completed without failure...proceeding.")
-                            }
-                        }
-                    }
-                }
-            }
+                                 println("Check the scan results status")
+                                 env.output = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json evaluate check --policy $POLICY $digest --show-history --tag $IMAGENAME":"$TAG | jq --arg DIGEST $digest --arg IMAGE $IMAGENAME:$TAG -r \'.[] | .[$DIGEST] | to_entries | .[] | select(.key | strings| test($IMAGE)) | .value[] .status\'',
+                                             returnStdout: true).trim()
+                                 println("output is " + output)
+                                 if (output == "pass") {
+                                     println("Anchore analysis has passed...proceeding")
+                                 }
+                                 else if (output == "fail") {
+                                     println("ERROR:: Anchore analysis indicates an analysis status of FAIL.")
+                                     currentBuild.result = 'FAILURE'
+                                     error("Stopping early due to Anchore analysis policy failure")
+                                 }
+                                 else {
+                                     println("Anchore analysis completed without failure...proceeding.")
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
             stage("Test") {
                 steps {
                      script {
