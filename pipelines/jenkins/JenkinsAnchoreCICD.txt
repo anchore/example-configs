@@ -84,7 +84,8 @@ pipeline {
                                  println("Checking scan status...for " + digest)
                                  env.status = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image get $IMAGENAME:$TAG | jq -r \'.[] .analysis_status\'', returnStdout: true).trim()
 
-                                 // If the scan status indicates not analyzed, we initiate a wait using the timeout configured at the beginning of the pipeline.
+                                 // If the scan status indicates not analyzed, we initiate a wait using the timeout configured
+                                 // at the beginning of the pipeline.
                                  println("Analysis Status: " + status)
                                  if (status == "not_analyzed") {
                                      println("Waiting for image to be analyzed...")
