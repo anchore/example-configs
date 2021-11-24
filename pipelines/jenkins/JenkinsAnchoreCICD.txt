@@ -1,12 +1,13 @@
 pipeline {
         agent any
         environment {
-            //Define some reusable variables here 
-            IMAGENAME="kaizencont/goutil"
-            WAIT_TIMEOUT=10
-            ANCHORE_URL="http://10.0.0.15:8080/v1/"
+            //Define some reusable variables here
+            IMAGENAME="kaizencont/goutils"                 //Imagename
+            WAIT_TIMEOUT=10                                //Defined timeout used in conjunction with `wait`
+            ANCHORE_URL="http://10.0.0.15:8080/v1/"        //Url for the Anchore instance
             dockerImage = '' 
             registryCredential = 'dockerhub'
+            POLICY="2c53a13c-1765-11e8-82ef-23527761d060"  //Policybundle ID to be used when checking the analysis results
         }
         stages {
              stage ('Build') {
@@ -29,7 +30,9 @@ pipeline {
                     }
                 }
             }
-            
+
+            // This stage is intended for demonstration purposes, it is NOT strictly required. The intent here is to provide an exampel of how one could check on the status of Anchore and then use that status
+            // to inform and potentially block (or not) follow on stages. Notice in the `Submit image for scanning` stage, we check the `anchoreStatus` prior to proceeding.
             stage("Verifying Anchore Availability") {
                 steps {
                     script {
@@ -61,24 +64,30 @@ pipeline {
                             println("Anchore is availabile...proceeding.")
                             
                             // Here we use credentials configured in the Jenkins credentials store to authenticate to the anchore instance.
-                            withCredentials([usernamePassword(credentialsId: 'Anchore-Pass', passwordVariable: 'pass', usernameVariable: 'user')]) {
-                                
-                                // Submit the image to Anchore for scanning
-                                println("Submitting image for analysis...")
-                                env.digest = sh (script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image add $IMAGENAME":"$TAG | jq -r \'.[] .image_detail[] .digest\'',
-                                    returnStdout: true).trim()
-    
-                                // Check on the status of the scan
-                                println("Checking scan status...for " + digest)
-                                env.status = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image get $IMAGENAME:$TAG | jq -r \'.[] .analysis_status\'', returnStdout: true).trim()
-                                
-                                // If the scan status indicates not analyzed, we initiate a wait using the timeout configured at the beginning of the pipeline.
-                                println("Analysis Status: " + status)
-                                if (status == "not_analyzed") {
-                                    println("Waiting for image to be analyzed...")
-                                    sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image wait --timeout $WAIT_TIMEOUT $IMAGENAME:$TAG', returnStdout: true)
-                                }
-                            }
+                             withCredentials([usernamePassword(credentialsId: 'Anchore-Pass', passwordVariable: 'pass', usernameVariable: 'user')]) {
+
+                                 // Submit the image to Anchore for scanning
+                                 println("Submitting image for analysis...")
+
+                                 // Using the tag as a selector in the jq command ensures we are grabbing the digest for the image tag we just built.
+                                 env.digest = sh (script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image add $IMAGENAME":"$TAG | jq -r \'.[] .image_detail[] | select(.tag == \'\\"$TAG\\"\') | .digest\'',
+                                     returnStdout: true).trim()
+
+                                 // This section is somewhat contrived but demonstrate two points.
+                                 // First, it shows how you can check the status of the analysis for an image.
+                                 // Second, it shows how you can use the cli to wait (via the `wait` and `--timeout`) for the analysis to complete
+                                 //
+                                 // Check on the status of the scan
+                                 println("Checking scan status...for " + digest)
+                                 env.status = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image get $IMAGENAME:$TAG | jq -r \'.[] .analysis_status\'', returnStdout: true).trim()
+
+                                 // If the scan status indicates not analyzed, we initiate a wait using the timeout configured at the beginning of the pipeline.
+                                 println("Analysis Status: " + status)
+                                 if (status == "not_analyzed") {
+                                     println("Waiting for image to be analyzed...")
+                                     sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json image wait --timeout $WAIT_TIMEOUT $IMAGENAME:$TAG', returnStdout: true)
+                                 }
+                             }
                             
                         } else {
                             println("WARNING:: Anchore is not available, skipping scan submission")
@@ -86,12 +95,43 @@ pipeline {
                     }
                 }
             }
-            
             stage("Verify") {
                 steps {
-                 script {
-                     println ("Proceed with your organizations build process steps here...")
-                 }   
+                    script {
+                        println("Checking scan status...for " + digest)
+                          // Here we use credentials configured in the Jenkins credentials store to authenticate to the anchore instance.
+                         withCredentials([usernamePassword(credentialsId: 'Anchore-Pass', passwordVariable: 'pass', usernameVariable: 'user')]) {
+
+                            println("Check the scan results status")
+                            // Here we are performing a check on the analysis status. We are passing in the digest along with the tag
+                            // Here we make use passing arguments to jq to inject the digest and other envs
+                            // Be aware, the check json payload could contain multiple analysis results if a tag has had the analysis run on it more than one time. The below takes a naive approach to this.
+                            // Also note the --policy $POLICY.  POLICY is an environment variable that holds a policy bundle id...so the check call can be performed for a specific policy bundle if desired. This
+                            // of course can be removed if it's not desired.
+                            // Finally, if the results of the analysis is a `fail`, this stage will set the pipeline statue to `FAILURE` and end the pipeline run.
+                            env.output = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json evaluate check --policy $POLICY $digest --show-history --tag $IMAGENAME":"$TAG | jq --arg DIGEST $digest --arg IMAGE $IMAGENAME:$TAG -r \'.[] | .[$DIGEST] | to_entries | .[] | select(.key | strings| test($IMAGE)) | .value[] .status\'',
+                                        returnStdout: true).trim()
+
+                            if (output == "pass") {
+                                println("Anchore analysis has passed...proceeding")
+                            }
+                            else if (output == "fail") {
+                                println("ERROR:: Anchore analysis indicates an analysis status of FAIL.")
+                                currentBuild.result = 'FAILURE'
+                                error("Stopping early due to Anchore analysis policy failure")
+                            }
+                            else {
+                                println("Anchore analysis completed without failure...proceeding.")
+                            }
+                        }
+                    }
+                }
+            }
+            stage("Test") {
+                steps {
+                     script {
+                         println ("Proceed with your organizations build process steps here...")
+                     }
                 }
             }
         }
