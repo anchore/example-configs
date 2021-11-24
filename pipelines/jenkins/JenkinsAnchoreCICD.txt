@@ -37,12 +37,12 @@ pipeline {
             stage("Verifying Anchore Availability") {
                 steps {
                     script {
-                        // We attempt to discover the availability of the Anchore installation. This is currently looking to see if the api endpoint is reachable.
-                        // If the call fails entirely, we catch the exception and log it, but proceed on. We could add additional checking here on http status or
-                        // other pieces of the returned json object.
+                        // We attempt to discover the availability of the Anchore installation. This is currently looking to see if the api
+                        // endpoint is reachable. If the call fails entirely, we catch the exception and log it, but proceed on. We could
+                        // add additional checking here on http status or other pieces of the returned json object.
                         //
-                        // Important point here is anchoreStatus is getting set here so we can guard calls to anchore below and not kill the pipeline if Anchore
-                        // is unreachable.
+                        // Important point here is anchoreStatus is getting set here so we can guard calls to anchore below and not kill the
+                        // pipeline if Anchore is unreachable.
                         try {
                             withCredentials([usernamePassword(credentialsId: 'Anchore-Pass', passwordVariable: 'pass', usernameVariable: 'user')]) {
                                 env.anchoreStatus = sh(script: 'docker run --name anchorecli --rm anchore/anchore-cli-dev anchore-cli --u $user --p $pass --url $ANCHORE_URL --json system status | jq -r \'.service_states[] | select(.servicename == "apiext") .status_message\'', returnStdout: true).trim()
