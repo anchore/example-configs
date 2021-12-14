@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "anchore-engine-upgrade"
+spec:
+  template:
+    spec:
+      containers:
+      - name: "anchore-engine-upgrade"
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            echo "Calling the db update process"
+            # anchore-manager db --db-connect postgresql://"${ANCHORE_DB_USER}":"${ANCHORE_DB_PASSWORD}"@"${ANCHORE_DB_HOST}"/"${ANCHORE_DB_NAME}" upgrade --dontask;
+
+            echo "Preparing to stop the istio sidecar container..."
+            until curl -fsI http://localhost:15021/healthz/ready; do echo \"Waiting for Sidecar...\"; sleep 3; done;
+            echo \"Sidecar available. Running the command...\";
+            echo "Terminating the sidecar container now..."
+            x=$(echo $?); curl -fsI -X POST http://localhost:15020/quitquitquit && echo "Operation status: $x"
+            echo "ISTIO Sidecar terminated"
