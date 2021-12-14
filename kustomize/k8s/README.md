@@ -3,6 +3,14 @@ ISTIO With Kustomize
 This walks through one way of using customize to update the Anchore deployment to prevent Istio sidecars from being injected into Job pods.
 There are other ways this can be accomplished.
 
+There are 2 overlay directories here which represent two different methods of patching.  This readme doesn't not cover the mesh/istio-kill overlay, only the mesh/jsonpatch option.
+
+JSON Patch was used here versus Strategic Merge Patch the amount of patching to be done was very minimal (1 line in multiple files). 
+
+Additionally, with the mesh/istio-kill option, the Strategic Merge Patch did not appear to be a good fit because kustomize doesn't seem to handle case very well 
+(appending to the container cmd args list) because the patch directive only works when the merge key for the array is defined in k8s API 
+(https://github.com/kubernetes-sigs/kustomize/issues/3265)
+
 ## Istio Setup
 Install istio in your cluster
 https://istio.io/latest/docs/setup/getting-started/
