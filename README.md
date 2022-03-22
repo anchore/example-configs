@@ -5,3 +5,4 @@ A repository for storing example configurations for auxillary systems utilized b
 ## Contents
 
 - [Monitoring Configs](./monitoring/README.md)
+- [ Ironbank Compose](./ironbank-compose/README.md)
