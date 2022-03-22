@@ -137,7 +137,7 @@ has a `volumes` section which mounts the license file and an optional config.yam
 ```
 If desired, we can create and provide a configuration file to customize the service behavior. In a Kubernetes deployment
 this would be accomplished by tailoring the values.yaml file provided to the helm deployment. Here, we'll show how to 
-customize the feeds by specifying we want to provided the `feeds-config.yaml` provided in this repository to the feed 
+customize the feeds by specifying we want to provided the `feed-config.yaml` provided in this repository to the feed 
 service configuration in our docker-compose.
 
 We do this by uncomment the line that reads `- ./feed-config.yaml:/config/config.yaml:z`. See below.
