@@ -17,7 +17,7 @@ volumes:
 services:
   # The primary API endpoint service
   api:
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     depends_on:
       - anchore-db
       - catalog
@@ -50,7 +50,7 @@ services:
   # Catalog is the primary persistence and state manager of the system
   catalog:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     depends_on:
       - anchore-db
     volumes:
@@ -80,7 +80,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "catalog"]
   queue:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     depends_on:
       - anchore-db
       - catalog
@@ -110,7 +110,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "simplequeue"]
   policy-engine:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     depends_on:
       - anchore-db
       - catalog
@@ -150,7 +150,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "policy_engine"]
   analyzer:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     depends_on:
       - anchore-db
       - catalog
@@ -194,7 +194,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
   rbac-authorizer:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z
@@ -223,7 +223,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "rbac_authorizer"]
   rbac-manager:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z
@@ -254,7 +254,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "rbac_manager"]
   reports:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z      
@@ -285,7 +285,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "reports"]
   notifications:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z      
@@ -328,7 +328,7 @@ services:
       test: ["CMD-SHELL", "redis-cli PING"]
   ui:
     #image: docker.io/anchore/enterprise-ui:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui
+    image: registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.3.0
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-ui.yaml:/config/config-ui.yaml:z
@@ -369,7 +369,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
   feeds:
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
     volumes:
       - feeds-workspace-volume:/workspace
       - ./license.yaml:/license.yaml:ro
