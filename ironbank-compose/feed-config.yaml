@@ -1,0 +1,151 @@
+# Anchore Engine default configuration file bundled into the container. These values should provide a simple starting point
+# To fully customize configuration, provide a different config.yaml to container at startup by mounting a directory
+# at /config that has the config.yaml
+
+
+# These defaults are intended to serve a deployment where each service is started in its own container with individual overrides
+# for values like the endpoint hostname. This config provides a uniform setting of those such that env vars passed in from
+# execution will overwrite values needed.
+
+service_dir: ${ANCHORE_SERVICE_DIR}
+tmp_dir: /analysis_scratch
+log_level: ${ANCHORE_LOG_LEVEL}
+cleanup_images: true
+
+# When set, if a registry credential username is set to 'iamauto' for an ecr registry, the engine will
+# use whatever aws creds are available in the standard boto search path (.aws, env, etc)
+allow_awsecr_iam_auto: true
+host_id: "${ANCHORE_HOST_ID}"
+internal_ssl_verify: ${ANCHORE_INTERNAL_SSL_VERIFY}
+
+global_client_connect_timeout: ${ANCHORE_GLOBAL_CLIENT_CONNECT_TIMEOUT}
+global_client_read_timeout: ${ANCHORE_GLOBAL_CLIENT_READ_TIMEOUT}
+
+# Twisted has a global server side timeout on all established connections which defaults to 60, anything lasting longer
+# than this (+ a 15 min abort final timeout) will have the connection killed by twisted
+server_request_timeout_seconds: ${ANCHORE_GLOBAL_SERVER_REQUEST_TIMEOUT_SEC}
+
+auto_restart_services: false
+
+# Defines a maximum compressed image size (MB) to be added for analysis
+# Value < 0 disables feature
+# Disabled by default
+max_compressed_image_size_mb: ${ANCHORE_MAX_COMPRESSED_IMAGE_SIZE_MB}
+
+# Locations for keys used for signing and encryption. Only one of 'secret' or 'public_key_path'/'private_key_path' needs to be set. If all are set then the keys take precedence over the secret value
+# Secret is for a shared secret and if set, all components in anchore should have the exact same value in their configs.
+#
+keys:
+  secret: ${ANCHORE_AUTH_SECRET}
+  public_key_path: ${ANCHORE_AUTH_PUBKEY}
+  private_key_path: ${ANCHORE_AUTH_PRIVKEY}
+
+# Configuring supported user authentication and credential management
+user_authentication:
+  oauth:
+    enabled: ${ANCHORE_OAUTH_ENABLED}
+    default_token_expiration_seconds: ${ANCHORE_OAUTH_TOKEN_EXPIRATION}
+
+  # Set this to True to enable storing user passwords only as secure hashes in the db. This can dramatically increase CPU usage if you
+  # don't also use oauth and tokens for internal communications (which requires keys/secret to be configured as well)
+  # WARNING: you should not change this after a system has been initialized as it may cause a mismatch in existing passwords
+  hashed_passwords: ${ANCHORE_AUTH_ENABLE_HASHED_PASSWORDS}
+
+license_file: ${ANCHORE_ENTERPRISE_LICENSE_PATH}
+
+metrics:
+  enabled: ${ANCHORE_ENABLE_METRICS}
+  auth_disabled: ${ANCHORE_DISABLE_METRICS_AUTH}
+
+# Uncomment if you have a local endpoint that can accept
+# notifications from the anchore-engine, as configured below
+# This section is only required on the catalog service containers
+webhooks:
+  webhook_user: null
+  webhook_pass: null
+  ssl_verify: false
+  general:
+    url: ${ANCHORE_WEBHOOK_DESTINATION_URL}
+  policy_eval: {}
+  event_log: {}
+
+# As of 0.3.0 this section is used instead of the credentials.users section
+# Can be omitted and will default to 'foobar' on db initialization
+default_admin_password: foobar
+
+# Can be ommitted and will default to 'admin@myanchore'
+default_admin_email: ${ANCHORE_ADMIN_EMAIL}
+
+credentials:
+  database:
+    db_connect: 'postgresql://${ANCHORE_DB_USER}:${ANCHORE_DB_PASSWORD}@${ANCHORE_DB_HOST}:${ANCHORE_DB_PORT}/${ANCHORE_DB_NAME}'
+    db_connect_args:
+      timeout: 120
+      ssl: false
+    db_pool_size: 30
+    db_pool_max_overflow: 100
+services:
+  feeds:
+    enabled: true
+    require_auth: false
+    endpoint_hostname: "${ANCHORE_ENDPOINT_HOSTNAME}"
+    listen: '0.0.0.0'
+    port: 8228
+    cycle_timers:
+      # Time delay in seconds between consecutive driver runs for processing data
+      driver_sync: 120
+    # Staging space for holding normalized output from drivers. Persisted using a volume defined in docker-compose
+    local_workspace: '/workspace'
+    # Drivers process data from external sources and store normalized data in local_workspace. Processing large data sets
+    # is a time consuming process for some drivers. To speed it up the container is shipped with pre-loaded data that is used
+    # by default if local_workspace is empty
+    workspace_preload:
+      # Set enabled to false to force drivers to generate normalized data from scratch if local_workspace is empty
+      enabled: true
+      workspace_preload_file: '/workspace_preload/data.tar.gz'
+    # Set api_only to true for operating the service in read-only mode. API end points will and serve persisted data but all drivers will be disabled
+    api_only: "${ANCHORE_ENTERPRISE_API_ONLY}"
+    drivers:
+      # Configuration section for drivers gathering and normalizing feed data.
+      amzn:
+        enabled: false
+      alpine:
+        enabled: false
+      centos:
+        enabled: false
+      debian:
+        enabled: false
+      ol:
+        enabled: false
+      ubuntu:
+        enabled: false
+      rhel:
+        enabled: true
+      nvddb:
+        # disabled driver, a newer nvdv2 driver is available
+        enabled: false
+      npm:
+        # npm driver is disabled out of the box
+        enabled: "${ANCHORE_ENTERPRISE_PACKAGE_DRIVERS_ENABLED}"
+      gem:
+        # rubygems driver is disabled out of the box
+        enabled: "${ANCHORE_ENTERPRISE_PACKAGE_DRIVERS_ENABLED}"
+        # rubygems package data is a PostgreSQL dump. db_connect string defines the database endpoint to be used for loading the data
+        db_connect: 'postgresql://${ANCHORE_DB_USER}:${ANCHORE_DB_PASSWORD}@${ANCHORE_DB_HOST}:${ANCHORE_DB_PORT}/${ANCHORE_RUBYGEMS_DB_NAME}'
+      nvdv2:
+        enabled: true
+      vulndb:
+        enabled: false
+      msrc:
+        enabled: false
+        # Uncomment to add MSRC product IDs for generating their feed data, this extends the pre-defined list of product IDs
+        # whitelist:
+        # - 12345
+      github:
+        enabled: false
+        token: "${ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN}"
+      grypedb:
+        enabled: true
+        external_feeds_url: "${ANCHORE_ENTERPRISE_FEEDS_EXTERNAL_URL}"
+      sles:
+        enabled: false
