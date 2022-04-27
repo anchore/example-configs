@@ -4,7 +4,7 @@
 version: '2.1'
 volumes:
   # Since this is for a quickstart, each minor version has its own db, to use a previous db and upgrade, change this to the db volume name you want to upgrade. e.g. "anchore-enterprise-3.2-db" if upgrading from a 3.2 quickstart deployment.
-  anchore-enterprise-3.3-db:
+  anchore-enterprise-4.0.1-db:
     # Set this to 'true' to use an external volume. In which case, it must be created manually with "docker volume create anchore-db-volume"
     external: false
   feeds-workspace-volume:
@@ -17,7 +17,7 @@ volumes:
 services:
   # The primary API endpoint service
   api:
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     depends_on:
       - anchore-db
       - catalog
@@ -49,8 +49,7 @@ services:
     command: ["anchore-enterprise-manager", "service", "start",  "apiext"]
   # Catalog is the primary persistence and state manager of the system
   catalog:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     depends_on:
       - anchore-db
     volumes:
@@ -79,8 +78,7 @@ services:
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "catalog"]
   queue:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     depends_on:
       - anchore-db
       - catalog
@@ -109,8 +107,7 @@ services:
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "simplequeue"]
   policy-engine:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     depends_on:
       - anchore-db
       - catalog
@@ -149,8 +146,7 @@ services:
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "policy_engine"]
   analyzer:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     depends_on:
       - anchore-db
       - catalog
@@ -194,7 +190,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
   rbac-authorizer:
     #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z
@@ -222,8 +218,7 @@ services:
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "rbac_authorizer"]
   rbac-manager:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z
@@ -253,8 +248,7 @@ services:
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "rbac_manager"]
   reports:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z      
@@ -284,8 +278,7 @@ services:
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "reports"]
   notifications:
-    #image: docker.io/anchore/enterprise:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-enterprise.yaml:/config/config.yaml:z      
@@ -327,8 +320,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "redis-cli PING"]
   ui:
-    #image: docker.io/anchore/enterprise-ui:v3.3.0
-    image: registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:4.0.0
     volumes:
       - ./license.yaml:/license.yaml:ro
       #- ./config-ui.yaml:/config/config-ui.yaml:z
@@ -369,7 +361,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
   feeds:
-    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.3.0
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     volumes:
       - feeds-workspace-volume:/workspace
       - ./license.yaml:/license.yaml:ro
