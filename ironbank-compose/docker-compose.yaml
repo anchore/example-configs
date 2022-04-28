@@ -1,10 +1,10 @@
-
 # All-in-one docker-compose deployment of a full anchore-enterprise service system
 ---
 version: '2.1'
 volumes:
   # Since this is for a quickstart, each minor version has its own db, to use a previous db and upgrade, change this to the db volume name you want to upgrade. e.g. "anchore-enterprise-4.0.1-db" if upgrading from a 4.0.1 quickstart deployment.
   anchore-enterprise-4.0.1-db:
+
     # Set this to 'true' to use an external volume. In which case, it must be created manually with "docker volume create anchore-db-volume"
     external: false
   feeds-workspace-volume:
@@ -38,12 +38,13 @@ services:
       - ANCHORE_EXTERNAL_AUTHZ_ENDPOINT=http://rbac-authorizer:8228
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_AUTH_PRIVKEY=null
       - ANCHORE_AUTH_PUBKEY=null
       - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
-      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -69,11 +70,13 @@ services:
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
       - ANCHORE_CATALOG_NOTIFICATION_INTERVAL_SEC=0
+      - ANCHORE_CLI_PASS=foobar
       - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_AUTH_PRIVKEY=null
       - ANCHORE_AUTH_PUBKEY=null
       - ANCHORE_AUTH_SECRET=null
       - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -98,11 +101,13 @@ services:
       - ANCHORE_DB_PASSWORD=mysecretpassword
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
       - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_AUTH_PRIVKEY=null
       - ANCHORE_AUTH_PUBKEY=null
       - ANCHORE_AUTH_SECRET=null
       - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -122,26 +127,27 @@ services:
       options:
         max-size: 100m
     environment:
-      - ANCHORE_AUTH_PRIVKEY=null
-      - ANCHORE_AUTH_PUBKEY=null
-      - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
-      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
       - ANCHORE_ENDPOINT_HOSTNAME=policy-engine
       - ANCHORE_DB_HOST=anchore-db
       - ANCHORE_DB_PASSWORD=mysecretpassword
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
-      # Vulnerability provider is one of grype or legacy
       - ANCHORE_VULNERABILITIES_PROVIDER=grype
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # To use on-prem feed service with grype, uncomment ANCHORE_GRYPE_DB_URL. In addition, uncomment the enterprise-feeds-db and feeds services at the end of this file
-      - ANCHORE_GRYPE_DB_URL=http://feeds:8228/v1/databases/grypedb
-      # To use on-prem feed service with legacy, uncomment the following ANCHORE_FEEDS_* environment variables. In addition, uncomment the enterprise-feeds-db and feeds services at the end of this file
+      #- ANCHORE_GRYPE_DB_URL=http://feeds:8228/v1/databases/grypedb
+      # To use on-prem feed service, uncomment the following ANCHORE_FEEDS_* environment variables. In addition, uncomment the enterprise-feeds-db and feeds services at the end of this file
       #- ANCHORE_FEEDS_URL=http://feeds:8228/v1/feeds
-      - ANCHORE_FEEDS_CLIENT_URL=null
-      - ANCHORE_FEEDS_TOKEN_URL=null
+      #- ANCHORE_FEEDS_CLIENT_URL=null
+      #- ANCHORE_FEEDS_TOKEN_URL=null
       # Uncomment the next variable in addition to enabling the on-prem feed service just above, to enable syncing of the MSRC data feeds for windows scanning support.
-      - ANCHORE_FEEDS_MICROSOFT_ENABLED=true
+      #- ANCHORE_FEEDS_MICROSOFT_ENABLED=true
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -158,15 +164,18 @@ services:
       options:
         max-size: 100m
     environment:
-      - ANCHORE_AUTH_PRIVKEY=null
-      - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
-      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
       - ANCHORE_ENDPOINT_HOSTNAME=analyzer
       - ANCHORE_DB_HOST=anchore-db
       - ANCHORE_DB_PASSWORD=mysecretpassword
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -176,7 +185,7 @@ services:
       #- ./config-engine.yaml:/config/config.yaml:z
     command: ["anchore-enterprise-manager", "service", "start",  "analyzer"]
   anchore-db:
-    image: "postgres:9"
+    image: "postgres:12"
     volumes:
       - anchore-enterprise-4.0.1-db:/var/lib/postgresql/data
     environment:
@@ -204,16 +213,18 @@ services:
       options:
         max-size: 100m
     environment:
-      - ANCHORE_AUTH_PRIVKEY=null
-      - ANCHORE_AUTH_PUBKEY=null
-      - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
-      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
       - ANCHORE_ENDPOINT_HOSTNAME=rbac-authorizer
       - ANCHORE_DB_HOST=anchore-db
       - ANCHORE_DB_PASSWORD=mysecretpassword
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -233,11 +244,6 @@ services:
       options:
         max-size: 100m
     environment:
-      - ANCHORE_AUTH_PRIVKEY=null
-      - ANCHORE_AUTH_PUBKEY=null
-      - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
-      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
       - ANCHORE_ENDPOINT_HOSTNAME=rbac-manager
       - ANCHORE_DB_HOST=anchore-db
       - ANCHORE_DB_PASSWORD=mysecretpassword
@@ -245,6 +251,13 @@ services:
       - ANCHORE_EXTERNAL_AUTHZ_ENDPOINT=http://rbac-authorizer:8228
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -264,10 +277,6 @@ services:
       options:
         max-size: 100m
     environment:
-      - ANCHORE_AUTH_PRIVKEY=null
-      - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
-      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
       - ANCHORE_ENDPOINT_HOSTNAME=reports
       - ANCHORE_DB_HOST=anchore-db
       - ANCHORE_DB_PASSWORD=mysecretpassword
@@ -275,10 +284,48 @@ services:
       - ANCHORE_AUTHZ_HANDLER=external
       - ANCHORE_EXTERNAL_AUTHZ_ENDPOINT=http://rbac-authorizer:8228
       - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
     command: ["anchore-enterprise-manager", "service", "start",  "reports"]
+  reports_worker:
+    image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.0
+    volumes:
+      - ./license.yaml:/license.yaml:ro
+      #- ./config-enterprise.yaml:/config/config.yaml:z      
+    depends_on:
+      - anchore-db
+      - catalog
+    expose:
+      - 8228
+    logging:
+       driver: "json-file"
+       options:
+         max-size: 100m
+    environment:
+      - ANCHORE_ENDPOINT_HOSTNAME=reports_worker
+      - ANCHORE_DB_HOST=anchore-db
+      - ANCHORE_DB_PASSWORD=mysecretpassword
+      - ANCHORE_ENABLE_METRICS=false
+      - ANCHORE_LOG_LEVEL=INFO
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
+      # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
+      #- ANCHORE_OAUTH_ENABLED=true
+      #- ANCHORE_AUTH_SECRET=supersharedsecret
+    command: ["anchore-enterprise-manager", "service", "start",  "reports_worker"]
   notifications:
     image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
     volumes:
@@ -302,11 +349,13 @@ services:
       - ANCHORE_EXTERNAL_AUTHZ_ENDPOINT=http://rbac-authorizer:8228
       - ANCHORE_LOG_LEVEL=INFO
       - ANCHORE_ENTERPRISE_UI_URL=http://localhost:3000
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_AUTH_PRIVKEY=null
       - ANCHORE_AUTH_PUBKEY=null
       - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -343,13 +392,16 @@ services:
       - ANCHORE_APPDB_URI=postgres://postgres:mysecretpassword@anchore-db:5432/postgres
       - ANCHORE_REPORTS_URI=http://reports:8228/v1
       - ANCHORE_NOTIFICATIONS_URI=http://notifications:8228/v1
+      - ANCHORE_CLI_PASS=foobar
+      - ANCHORE_ADMIN_PASSWORD=foobar
       - ANCHORE_AUTH_PRIVKEY=null
       - ANCHORE_AUTH_PUBKEY=null
       - ANCHORE_AUTH_SECRET=null
-      - ANCHORE_ADMIN_PASSWORD=foobar
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
   # Uncomment this section to add an on-prem feed service to this deployment. This will incur first-time feed sync delay, but is included for completeness / review of enterprise service deployment options
   enterprise-feeds-db:
-    image: "postgres:9"
+    image: "postgres:12"
     volumes:
       - enterprise-feeds-db-volume:/var/lib/postgresql/data
     environment:
@@ -367,7 +419,7 @@ services:
     volumes:
       - feeds-workspace-volume:/workspace
       - ./license.yaml:/license.yaml:ro
-      # - ./feed-config.yaml:/config/config.yaml:z
+      #- ./config-enterprise.yaml:/config/config.yaml:z
     depends_on:
       - enterprise-feeds-db
     ports:
@@ -377,23 +429,24 @@ services:
       options:
         max-size: 100m
     environment:
-      - ANCHORE_AUTH_PRIVKEY=null
-      - ANCHORE_AUTH_PUBKEY=null
-      - ANCHORE_AUTH_SECRET=null
       - ANCHORE_ENDPOINT_HOSTNAME=feeds
       - ANCHORE_DB_HOST=enterprise-feeds-db
       - ANCHORE_DB_PASSWORD=mysecretpassword
       - ANCHORE_ENABLE_METRICS=false
       - ANCHORE_LOG_LEVEL=DEBUG
       - ANCHORE_ADMIN_PASSWORD=foobar
-      - ANCHORE_ENTERPRISE_FEEDS_EXTERNAL_URL=http://feeds:8228/v1  
+      - ANCHORE_ENTERPRISE_FEEDS_EXTERNAL_URL=http://feeds:8228/v1
+      - ANCHORE_AUTH_PRIVKEY=null
+      - ANCHORE_AUTH_PUBKEY=null
+      - ANCHORE_AUTH_SECRET=null
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
+      - ANCHORE_POLICY_EVAL_CACHE_TTL_SECONDS=360
       # Uncomment the following to enable Microsoft msrc driver.
       - ANCHORE_ENTERPRISE_FEEDS_MSRC_DRIVER_ENABLED=true
-      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=null
       # Uncomment ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN for github driver.
       # Generate token with https://github.com/settings/tokens/new?scopes=user,public_repo,repo,repo_deployment,repo:status,read:repo_hook,read:org,read:public_key,read:gpg_key
       # and assign the value to environment variable
-      # - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=${ANCHORE_GITHUB_KEY}
+      - ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN=${ANCHORE_GITHUB_KEY}
       # Uncomment both ANCHORE_OAUTH_ENABLED and ANCHORE_AUTH_SECRET to enable SSO feature of anchore-enterprise
       #- ANCHORE_OAUTH_ENABLED=true
       #- ANCHORE_AUTH_SECRET=supersharedsecret
@@ -401,7 +454,7 @@ services:
 
 #  # Uncomment this section to add a prometheus instance to gather metrics. This is mostly for quickstart to demonstrate prometheus metrics exported
 #  prometheus:
-#    image: docker.io/prom/promethus:latest
+#    image: docker.io/prom/prometheus:latest
 #    depends_on:
 #      - api
 #    volumes:
@@ -413,25 +466,25 @@ services:
 #    ports:
 #      - "9090:9090"
 #
-#  # Uncomment this section to run a swagger UI service, for inspecting and interacting with the anchore engine API via a browser (http://localhost:8080 by default, change if needed in both sections below)
-  #swagger-ui-nginx:
-  #  image: docker.io/nginx:latest
-  #  depends_on:
-  #    - api
-  #    - swagger-ui
-  #  ports:
-  #    - "8080:8080"
-  #  volumes:
-  #    - ./anchore-swaggerui-nginx.conf:/etc/nginx/nginx.conf:z
-  #  logging:
-  #    driver: "json-file"
-  #    options:
-  #      max-size: 100m
-  #swagger-ui:
-  #  image: docker.io/swaggerapi/swagger-ui
-  #  environment:
-  #    - URL=http://localhost:8080/v1/swagger.json
-  #  logging:
-  #    driver: "json-file"
-  #    options:
-  ##      max-size: 100m
+#   Uncomment this section to run a swagger UI service, for inspecting and interacting with the anchore engine API via a browser (http://localhost:8080 by default, change if needed in both sections below)
+# swagger-ui-nginx:
+#   image: docker.io/nginx:latest
+#   depends_on:
+#     - api
+#     - swagger-ui
+#   ports:
+#     - "8080:8080"
+#   volumes:
+#     - ./anchore-swaggerui-nginx.conf:/etc/nginx/nginx.conf:z
+#  logging:
+#     driver: "json-file"
+#     options:
+#       max-size: 100m
+# swagger-ui:
+#   image: docker.io/swaggerapi/swagger-ui
+#   environment:
+#     - URL=http://localhost:8080/v1/swagger.json
+#   logging:
+#     driver: "json-file"
+#     options:
+#       max-size: 100m
