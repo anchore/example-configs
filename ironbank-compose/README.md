@@ -4,11 +4,7 @@ This repository contains an example docker-compose configuration that works with
 images from IronBank.
 
 
-This compose file is configured for use with Anchore Enterprise 4.0.1
-
-NOTE: For version 4.0.1 there is NOT a enterprise:4.0.1, only 4.0.0. Moving forward enterprise and enterprise ui versions
-will typically remain in step.
-
+This compose file is configured for use with Anchore Enterprise 4.0.2
 
 ##### Prerequisites
 This example assumes you have the following:
@@ -53,9 +49,11 @@ ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN   # can be null
 
 ##### Ironbank Images:
 
-* registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
+* registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.2
 
-* registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:4.0.0
+* registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:4.0.2
+
+* registry1.dso.mil/ironbank/opensource/postgres/postgresql12:12.11
 
 The Anchore Enterprise docker-compose quick start can be run with minimal modification for the purposes of getting
 started quickly. To do that, you could simply clone this repository, ensure the license file is available and run:
@@ -69,7 +67,7 @@ This should result in the following output:
 
 ```shell
 Creating network "ironbank-compose_default" with the default driver
-Creating volume "ironbank-compose_anchore-enterprise-4.0-db" with default driver
+Creating volume "ironbank-compose_anchore-enterprise-4.0.2-db" with default driver
 Creating volume "ironbank-compose_feeds-workspace-volume" with default driver
 Creating volume "ironbank-compose_enterprise-feeds-db-volume" with default driver
 Pulling catalog (registry1.dso.mil/ironbank/anchore/enterprise/enterprise:)...
