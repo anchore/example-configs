@@ -4,11 +4,7 @@ This repository contains an example docker-compose configuration that works with
 images from IronBank.
 
 
-This compose file is configured for use with Anchore Enterprise 4.0.1
-
-NOTE: For version 4.0.1 there is NOT a enterprise:4.0.1, only 4.0.0. Moving forward enterprise and enterprise ui versions
-will typically remain in step.
-
+This compose file is configured for use with Anchore Enterprise 4.0.2
 
 ##### Prerequisites
 This example assumes you have the following:
@@ -53,9 +49,11 @@ ANCHORE_ENTERPRISE_FEEDS_GITHUB_DRIVER_TOKEN   # can be null
 
 ##### Ironbank Images:
 
-* registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.1
+* registry1.dso.mil/ironbank/anchore/enterprise/enterprise:4.0.2
 
-* registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:4.0.0
+* registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:4.0.2
+
+* registry1.dso.mil/ironbank/opensource/postgres/postgresql:13.6
 
 The Anchore Enterprise docker-compose quick start can be run with minimal modification for the purposes of getting
 started quickly. To do that, you could simply clone this repository, ensure the license file is available and run:
@@ -69,7 +67,7 @@ This should result in the following output:
 
 ```shell
 Creating network "ironbank-compose_default" with the default driver
-Creating volume "ironbank-compose_anchore-enterprise-4.0-db" with default driver
+Creating volume "ironbank-compose_anchore-enterprise-4.0.2-db" with default driver
 Creating volume "ironbank-compose_feeds-workspace-volume" with default driver
 Creating volume "ironbank-compose_enterprise-feeds-db-volume" with default driver
 Pulling catalog (registry1.dso.mil/ironbank/anchore/enterprise/enterprise:)...
@@ -98,37 +96,39 @@ You can check the status be doing the following:
  
                  Name                               Command                  State                        Ports
 ---------------------------------------------------------------------------------------------------------------------------------
-ironbank-compose_analyzer_1              /docker-entrypoint.sh anch ...   Up (healthy)   8228/tcp
-ironbank-compose_anchore-db_1            docker-entrypoint.sh postgres    Up (healthy)   5432/tcp
-ironbank-compose_api_1                   /docker-entrypoint.sh anch ...   Up (healthy)   0.0.0.0:8228->8228/tcp,:::8228->8228/tcp
-ironbank-compose_catalog_1               /docker-entrypoint.sh anch ...   Up (healthy)   8228/tcp
-ironbank-compose_enterprise-feeds-db_1   docker-entrypoint.sh postgres    Up (healthy)   5432/tcp
-ironbank-compose_feeds_1                 /docker-entrypoint.sh anch ...   Up (healthy)   0.0.0.0:8448->8228/tcp,:::8448->8228/tcp
-ironbank-compose_notifications_1         /docker-entrypoint.sh anch ...   Up (healthy)   0.0.0.0:8668->8228/tcp,:::8668->8228/tcp
-ironbank-compose_policy-engine_1         /docker-entrypoint.sh anch ...   Up (healthy)   8228/tcp
-ironbank-compose_queue_1                 /docker-entrypoint.sh anch ...   Up (healthy)   8228/tcp
-ironbank-compose_rbac-authorizer_1       /docker-entrypoint.sh anch ...   Up (healthy)   8089/tcp, 8228/tcp
-ironbank-compose_rbac-manager_1          /docker-entrypoint.sh anch ...   Up (healthy)   0.0.0.0:8229->8228/tcp,:::8229->8228/tcp
-ironbank-compose_reports_1               /docker-entrypoint.sh anch ...   Up (healthy)   0.0.0.0:8558->8228/tcp,:::8558->8228/tcp
+ironbank-compose_analyzer_1              /docker-entrypoint.sh anch ...   Up             8228/tcp
+ironbank-compose_anchore-db_1            /usr/local/bin/docker-entr ...   Up (healthy)   5432/tcp
+ironbank-compose_api_1                   /docker-entrypoint.sh anch ...   Up             0.0.0.0:8228->8228/tcp,:::8228->8228/tcp
+ironbank-compose_catalog_1               /docker-entrypoint.sh anch ...   Up             8228/tcp
+ironbank-compose_enterprise-feeds-db_1   /usr/local/bin/docker-entr ...   Up (healthy)   5432/tcp
+ironbank-compose_feeds_1                 /docker-entrypoint.sh anch ...   Up             0.0.0.0:8448->8228/tcp,:::8448->8228/tcp
+ironbank-compose_notifications_1         /docker-entrypoint.sh anch ...   Up             0.0.0.0:8668->8228/tcp,:::8668->8228/tcp
+ironbank-compose_policy-engine_1         /docker-entrypoint.sh anch ...   Up             8228/tcp
+ironbank-compose_queue_1                 /docker-entrypoint.sh anch ...   Up             8228/tcp
+ironbank-compose_rbac-authorizer_1       /docker-entrypoint.sh anch ...   Up             8089/tcp, 8228/tcp
+ironbank-compose_rbac-manager_1          /docker-entrypoint.sh anch ...   Up             0.0.0.0:8229->8228/tcp,:::8229->8228/tcp
+ironbank-compose_reports_1               /docker-entrypoint.sh anch ...   Up             0.0.0.0:8558->8228/tcp,:::8558->8228/tcp
+ironbank-compose_reports_worker_1        /docker-entrypoint.sh anch ...   Up             8228/tcp
 ironbank-compose_ui-redis_1              docker-entrypoint.sh redis ...   Up (healthy)   6379/tcp
-ironbank-compose_ui_1                    /docker-entrypoint.sh node ...   Up (healthy)   0.0.0.0:3000->3000/tcp,:::3000->3000/tcp
+ironbank-compose_ui_1                    /docker-entrypoint.sh node ...   Up             0.0.0.0:3000->3000/tcp,:::3000->3000/tcp
 ```
 And finally to check the status of the services you can run:
 
 ```shell
 $ anchore-cli --u admin --p foobar --url http://localhost:8228/v1 system status
-Service reports (anchore-quickstart, http://reports:8228): up
 Service analyzer (anchore-quickstart, http://analyzer:8228): up
-Service simplequeue (anchore-quickstart, http://queue:8228): up
-Service notifications (anchore-quickstart, http://notifications:8228): up
+Service reports (anchore-quickstart, http://reports:8228): up
 Service rbac_authorizer (anchore-quickstart, http://rbac-authorizer:8228): up
-Service policy_engine (anchore-quickstart, http://policy-engine:8228): up
-Service apiext (anchore-quickstart, http://api:8228): up
+Service reports_worker (anchore-quickstart, http://reports_worker:8228): up
+Service notifications (anchore-quickstart, http://notifications:8228): up
 Service rbac_manager (anchore-quickstart, http://rbac-manager:8228): up
+Service apiext (anchore-quickstart, http://api:8228): up
+Service simplequeue (anchore-quickstart, http://queue:8228): up
+Service policy_engine (anchore-quickstart, http://policy-engine:8228): up
 Service catalog (anchore-quickstart, http://catalog:8228): up
 
 Engine DB Version: 0.0.17
-Engine Code Version: 4.0.0
+Engine Code Version: 4.0.2
 ```
 You can also navigate to `http://localhost:3000` in your browser to see the Anchore Enterprise user interface and use the 
 default admin user and password (set by the env var above) to log in.
@@ -192,8 +192,6 @@ drivers:
     db_connect: 'postgresql://${ANCHORE_DB_USER}:${ANCHORE_DB_PASSWORD}@${ANCHORE_DB_HOST}:${ANCHORE_DB_PORT}/${ANCHORE_RUBYGEMS_DB_NAME}'
   nvdv2:
     enabled: true
-  vulndb:
-    enabled: false
   msrc:
     enabled: false
 ```
