@@ -1,0 +1,74 @@
+---
+- name: Anchore API Loader Playbook
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/config_vars.yml
+    - vars/values.yml
+  vars_prompt:
+   - name: admin_pass
+     prompt: "Enter Password for Anchore Admin User"
+     private: yes
+     encrypt: sha512_crypt
+     confirm: yes
+   - name: docker_access_token
+     prompt: "Enter API Token/Password for 'docker_user' (Required when adding private registries)"
+     private: yes
+     encrypt: sha512_crypt
+     confirm: yes
+  tasks:
+    - set_fact:
+        user_defaults: "{{ users_def | from_yaml }}"
+      vars:
+        users_def: |-
+          {% for i in users %}
+          - {name: {{ i.name }}, account: {{ i.default_account }}}
+          {% endfor %}
+
+    - set_fact:
+        user_account_roles: "{{ _users | from_yaml }}"
+      vars:
+        _users: |-
+          {% for i in users %}
+          {% for j in i.roles %}
+          - {name: {{ i.name }}, context: {{ j.context }}, role: {{ j.role }}}
+          {% endfor %}
+          {% endfor %}
+
+    - debug:
+        msg: "{{ user_account_roles }}"
+
+    - debug:
+        msg: "{{ user_defaults }}"
+
+    - name: Create Account Contexts
+      include_tasks: "tasks/account_add.yaml"
+
+    - name: Add Admin Users to Admin Account Context
+      include_tasks: "tasks/admin_user_add.yaml"
+    
+    - name: Add Acccount Users to Default Account Contexts
+      include_tasks: "tasks/accounts_user_add.yaml"
+   
+    - name: Add Private Registries to all account contexts
+      include_tasks: "tasks/registry_accounts.yaml"
+      loop: "{{ accounts }}"
+      loop_control:
+        loop_var: registry_account
+
+    - name: Add images to all account contexts
+      include_tasks: "tasks/image_accounts.yaml"
+      loop: "{{ accounts }}"
+      loop_control:
+        loop_var: account    
+    
+    - name: Add policy packs to all account contexts
+      include_tasks: "tasks/policy_accounts.yaml"
+      loop: "{{ accounts }}"
+      loop_control:
+        loop_var: policy_account
+
+    
+
+
+  

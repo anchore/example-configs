@@ -1,0 +1,6 @@
+---
+- name: Add policies
+  include_tasks: "tasks/policy_add.yaml"
+  loop: "{{ policy_packs }}"
+  loop_control:
+    loop_var: policy_pack_name

@@ -1,0 +1,4 @@
+---
+anchore_api_url: ""
+default_user_pass: "foobar"
+docker_user: ""

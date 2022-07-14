@@ -1,0 +1,6 @@
+---
+- name: Add private registries 
+  include_tasks: tasks/registry_add.yaml
+  loop: "{{ private_registries }}"
+  loop_control:
+    loop_var: priv_registries

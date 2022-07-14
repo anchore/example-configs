@@ -1,0 +1,24 @@
+---
+- name: Adding {{ priv_registries.name }} to {{ registry_account.name }}
+  uri:
+    url: https://{{ anchore_api_url }}/v1/registries
+    user: admin
+    password: "{{ admin_pass }}"
+    headers:
+      Content-Type: application/json
+      x-anchore-account: "{{ registry_account.name }}"
+      x-anchore-authz-action: createRegistry
+    method: POST
+    body:
+      registry_user: "{{ docker_user }}"
+      registry_pass: "{{ docker_access_token }}"
+      registry_type: "{{ priv_registries.type }}"
+      registry: "{{ priv_registries.url }}"
+      registry_name: "{{ priv_registries.name }}"
+      registry_verify: True
+    force_basic_auth: yes
+    validate_certs: no
+    body_format: json
+    status_code: [200, 500]
+  ignore_errors: true
+  register: add_account_registries
