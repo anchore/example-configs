@@ -1,0 +1,7 @@
+## Custom Files
+
+# Ansible Secrets 
+**/secrets/*
+
+# text files created during k3s bootstrap
+*.txt

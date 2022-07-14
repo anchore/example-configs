@@ -1,0 +1,20 @@
+---
+- name: Add Accounts
+  uri:
+    url: https://{{ anchore_api_url }}/v1/accounts
+    user: admin
+    password: "{{ admin_pass }}"
+    headers:
+      Content-Type: application/json
+      x-anchore-account: admin
+      x-anchore-authz-action: createAccount
+    method: POST
+    body:
+      name: "{{ item.name }}"
+      email: "{{ item.email }}"
+    force_basic_auth: yes
+    validate_certs: no
+    body_format: json
+    status_code: [200, 400, 409, 500]
+  register: accounts_add
+  with_items: "{{ accounts }}"

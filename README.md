@@ -8,5 +8,6 @@ A repository for storing example configurations for auxillary systems utilized b
 
 - [Jenkins Pipelines](./pipelines/jenkins/README.md)
 
-- [ Ironbank Compose](./ironbank-compose/README.md)
+- [Ironbank Compose](./ironbank-compose/README.md)
 
+- [Ansible Loader](./ansible-loader/README.md)

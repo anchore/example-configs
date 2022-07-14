@@ -1,0 +1,6 @@
+---
+- name: Add images
+  include_tasks: tasks/image_add.yaml
+  loop: "{{ images }}"
+  loop_control:
+    loop_var: image

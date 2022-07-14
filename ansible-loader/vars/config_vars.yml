@@ -1,0 +1,96 @@
+# Sample Images to be loaded and analyzed
+images:
+- docker.io/alpine:3.14.3
+- docker.io/alpine:latest
+- docker.io/anchore/test_images:allthethings_v1
+- docker.io/anchore/test_images:scratch-with-hints
+- docker.io/anchore/test_images:vulnerabilities-alpine
+- docker.io/anchore/test_images:vulnerabilities-debian
+- docker.io/apache/jspwiki:release-2.11.0
+- docker.io/buildpack-deps:bullseye-curl
+- docker.io/buildpack-deps:bullseye-scm
+- docker.io/busybox:latest
+- docker.io/debian:bullseye
+- docker.io/debian:bullseye-20211115
+- docker.io/debian:bullseye-20211115-slim
+- docker.io/debian:bullseye-slim
+- docker.io/debian:buster-slim
+- docker.io/dnurmi/testrepo:jarjar
+- docker.io/jenkins/jenkins:alpine
+- docker.io/jenkins/jenkins:latest
+- docker.io/jenkinsci/blueocean:latest
+- docker.io/nginx:alpine
+- docker.io/nginx:latest
+- docker.io/openjdk:11-jdk-bullseye
+- docker.io/tomcat:9.0
+- ghcr.io/pvnovarese/2022-01-enterprise-demo:main
+- ghcr.io/pvnovarese/2022-02-enterprise-demo:main
+- ghcr.io/pvnovarese/anchorectl-pipeline:main
+- ghcr.io/pvnovarese/devops-supply-chain-demo:main
+- registry.access.redhat.com/ubi8-minimal:latest
+- registry.access.redhat.com/ubi8:latest
+- registry.gitlab.com/pvn_test_images/2022-02-enterprise-demo:main
+- registry.gitlab.com/pvn_test_images/devops-supply-chain:main
+- registry.suse.com/suse/sle15:15.3
+- registry.suse.com/suse/sle15:latest
+- registry.suse.com/suse/sle15:latest
+- postgres:12.2
+- redis:5.0.8
+- python:3.6.10
+
+# Account Contexts and Team email(s)
+accounts:
+- name: security
+  email: security@example.com
+- name: inventory
+  email: inventory@example.com
+- name: pipeline
+  email: pipeline@example.com
+
+# Admin users in Admin Account
+admin_users:
+- name: admin_user1
+  password: foobar
+
+
+# User list with default contexts and roles per context 
+users:
+  - name: user1
+    default_account: pipeline
+    roles:
+      - context: security
+        role: full-control
+      - context: inventory
+        role: full-control
+      - context: pipeline
+        role: full-control
+
+  - name: user2
+    default_account: security 
+    roles:
+      - context: security
+        role: full-control
+      - context: inventory
+        role: full-control
+      - context: pipeline
+        role: full-control
+
+  - name: inventory-user
+    default_account: inventory
+    roles:
+      - context: inventory
+        role: inventory-agent
+
+# Policy Pack List in policy_bundles/  
+policy_packs:
+  - default_bundle.json
+
+# Private Registries (Requires docker_user[DockerHubID] and docker_access_token[Password] to be present
+private_registries:
+  - name: dockerhub
+    type: docker_v2
+    url: docker.io
+
+
+
+

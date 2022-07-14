@@ -1,0 +1,19 @@
+---
+- name: Add Image {{ image }} to {{ account.name }} account.
+  uri:
+    url: https://{{ anchore_api_url }}/v1/images
+    user: admin
+    password: "{{ admin_pass }}"
+    headers:
+      Content-Type: application/json
+      x-anchore-account: "{{ account.name }}"
+      x-anchore-authz-action: createImage
+    method: POST
+    body:
+      tag: "{{ image }}"
+    force_basic_auth: yes
+    validate_certs: no
+    body_format: json
+    status_code: [200, 400, 500]
+  register: image_add
+    

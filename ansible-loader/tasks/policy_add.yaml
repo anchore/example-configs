@@ -1,0 +1,17 @@
+---
+- name: Add Policy {{ policy_pack_name }} to {{ policy_account.name }} account.
+  ansible.builtin.uri:
+    url: https://{{ anchore_api_url }}/v1/policies
+    user: admin
+    password: "{{ admin_pass }}"
+    headers:
+      Content-Type: application/json
+      x-anchore-account: "{{ policy_account.name }}"
+      x-anchore-authz-action: createPolicy
+    method: POST
+    body: "{{ lookup('file', 'policy_bundles/{{ policy_pack_name }}') | from_json }}"
+    force_basic_auth: yes
+    validate_certs: no
+    body_format: json
+    status_code: [200, 400, 500]
+  register: policy_add

@@ -1,0 +1,21 @@
+---
+- name: "Adding Users to their Default Account Context"
+  uri:
+    url: https://{{ anchore_api_url }}/v1/accounts/{{ item.account }}/users
+    user: admin
+    password: "{{ admin_pass }}"
+    headers:
+      Content-Type: application/json
+      x-anchore-account: admin
+      x-anchore-authz-action: createUser
+    method: POST
+    body:
+      username: "{{ item.name }}"
+      password: "{{ default_user_pass }}"
+    force_basic_auth: yes
+    validate_certs: no
+    body_format: json
+    status_code: [200, 400, 500]
+  ignore_errors: true
+  register: add_account_users
+  loop: "{{ user_defaults }}"
