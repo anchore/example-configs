@@ -81,6 +81,9 @@ users:
       - context: inventory
         role: inventory-agent
 
+# Default Password set for the users created above
+default_user_pass: "foobar"
+
 # Policy Pack List in policy_bundles/  
 policy_packs:
   - default_bundle.json
