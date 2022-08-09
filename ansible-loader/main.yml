@@ -9,12 +9,10 @@
    - name: admin_pass
      prompt: "Enter Password for Anchore Admin User"
      private: yes
-     encrypt: sha512_crypt
      confirm: yes
    - name: docker_access_token
      prompt: "Enter API Token/Password for 'docker_user' (Required when adding private registries)"
      private: yes
-     encrypt: sha512_crypt
      confirm: yes
   tasks:
     - set_fact:
@@ -49,12 +47,6 @@
     
     - name: Add Acccount Users to Default Account Contexts
       include_tasks: "tasks/accounts_user_add.yaml"
-   
-    - name: Add Private Registries to all account contexts
-      include_tasks: "tasks/registry_accounts.yaml"
-      loop: "{{ accounts }}"
-      loop_control:
-        loop_var: registry_account
 
     - name: Add images to all account contexts
       include_tasks: "tasks/image_accounts.yaml"
@@ -67,6 +59,12 @@
       loop: "{{ accounts }}"
       loop_control:
         loop_var: policy_account
+
+    - name: Add Private Registries to all account contexts
+      include_tasks: "tasks/registry_accounts.yaml"
+      loop: "{{ accounts }}"
+      loop_control:
+        loop_var: registry_account
 
     
 

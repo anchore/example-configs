@@ -1,4 +1,5 @@
 ---
+# URL to the Anchore API endpoint. This playbook appends /v1 to any URL added below. Please do NOT set that as part of the URL. 
 anchore_api_url: ""
-default_user_pass: "foobar"
+# DockerID for configuring private registries.
 docker_user: ""
